@@ -6,7 +6,7 @@ import jade.wrapper.StaleProxyException;
 public class Main {
 
 	public static void main(String[] args) {
-		
+//		ouioui
 		//Création d'une instance de l'environnement Jade
 		jade.core.Runtime rt = jade.core.Runtime.instance();
 		
