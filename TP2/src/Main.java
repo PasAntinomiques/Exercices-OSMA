@@ -35,10 +35,37 @@ public class Main {
 //		}
 		
 //		----Exercice I-2)----
-		AgentController Agent2;
+//		AgentController Agent2;
+//		try {
+//			Agent2 = mc.createNewAgent("IAMSIMPLE", "mesAgents.IAMSIMPLE", null);
+//			Agent2.start();
+//		} catch (StaleProxyException e) {
+//			e.printStackTrace();
+//		}
+		
+//		----Exercice II)----
+//		AgentController Agent3;
+//		try {
+//			Agent3 = mc.createNewAgent("TimeAgent", "mesAgents.TimeAgent", null);
+//			Agent3.start();
+//		} catch (StaleProxyException e) {
+//			e.printStackTrace();
+//		}
+		
+//		----Exercice III)----
+//		AgentController Agent4;
+//		try {
+//			Agent4 = mc.createNewAgent("ComplexBehaviourAgent", "mesAgents.ComplexBehaviourAgent", null);
+//			Agent4.start();
+//		} catch (StaleProxyException e) {
+//			e.printStackTrace();
+//		}
+		
+//		---Exercice IV)---
+		AgentController Agent5;
 		try {
-			Agent2 = mc.createNewAgent("IAMSIMPLE", "mesAgents.IAMSIMPLE", null);
-			Agent2.start();
+			Agent5 = mc.createNewAgent("FiniteStateMachine", "mesAgents.FiniteStateMachine", null);
+			Agent5.start();
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}

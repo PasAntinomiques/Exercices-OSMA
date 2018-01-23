@@ -33,7 +33,6 @@ public class IAMSIMPLE extends Agent{
 		});
 		
 //		Comportement n°2
-		
 		class OneShot extends OneShotBehaviour{
 			public OneShot(Agent a) {
 				super(a);
