@@ -5,6 +5,7 @@ import java.util.Date;
 import jade.core.*;
 import jade.core.behaviours.*;
 
+@SuppressWarnings("serial")
 public class TIME extends Agent{
 	
 	//l'agent TIME doit afficher la date et l'heure courante chaque seconde
