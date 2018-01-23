@@ -101,7 +101,7 @@ public class FiniteStateMachine extends Agent{
 //		System.out.println("Décision vaut : " + b);
 		return b;
 	}
-	
+//	UTILISER UN FSMBEHAVIOUR
 	SequentialBehaviour Seq = new SequentialBehaviour(this);
 	int decision;
 	public void setup() {
