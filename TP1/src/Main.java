@@ -28,7 +28,8 @@ public class Main {
 		AgentController HelloIAmAtHome; 
 		//Agent qui contiendra l'adresse d'un autre agent
 		
-		int N=Integer.parseInt(args[0]);
+		int N = 3;
+//		int N=Integer.parseInt(args[0]);
 		//parsInt convertit les String en Integer
 		//elle peut générer une exception 'soft' donc pas de try catch
 		//n désigne le nombre d'agent de type HelloWorld à exécuter
