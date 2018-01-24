@@ -1,7 +1,6 @@
 package mesAgents;
 import jade.core.Agent;
 import jade.core.behaviours.*;
-import java.util.Random;
 
 
 @SuppressWarnings("serial")
