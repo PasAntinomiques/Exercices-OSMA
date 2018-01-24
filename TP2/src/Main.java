@@ -9,7 +9,7 @@ public class Main {
 	
 //		Création de l'environnement
 		jade.core.Runtime rt = jade.core.Runtime.instance();
-		//Création du main container nommé POSSAMAI (1 on paramètre le constructeur, 2 on construit)
+//		Création du main container nommé POSSAMAI (1 on paramètre le constructeur, 2 on construit)
 		ProfileImpl pMain = new ProfileImpl(null, 2000, "POSSAMAI");
 		AgentContainer mc = rt.createMainContainer(pMain);
 		
