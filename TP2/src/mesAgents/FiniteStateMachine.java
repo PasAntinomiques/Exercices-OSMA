@@ -15,6 +15,11 @@ public class FiniteStateMachine extends Agent{
 		public void action() {
 			System.out.println("Action A");
 		}
+//		Fonction qui permet de définir par la suite des transition, lorsqu'on retourne 9
+//		on prend comme convention de passer au comportement suivant directement
+		public int onEnd() {
+			return 9;
+		}
 	}
 //	Comportement B
 	public class OneShotB extends OneShotBehaviour{
@@ -23,6 +28,9 @@ public class FiniteStateMachine extends Agent{
 		}
 		public void action() {
 			System.out.println("Action B");
+		}
+		public int onEnd() {
+			return 9;
 		}
 	}	
 //	Comportement C
@@ -33,6 +41,10 @@ public class FiniteStateMachine extends Agent{
 		public void action() {
 			System.out.println("Action C");
 		}
+		public int onEnd() {
+//			permet de retouner un nombre entier entre 0 et 2
+			return (int) (Math.random()*3);
+		}
 	}
 //	Comportement D
 	public class OneShotD extends OneShotBehaviour{
@@ -42,6 +54,9 @@ public class FiniteStateMachine extends Agent{
 		public void action() {
 			System.out.println("Action D");
 		}
+		public int onEnd() {
+			return 9;
+		}
 	}
 //	Comportement E
 	public class OneShotE extends OneShotBehaviour{
@@ -50,6 +65,9 @@ public class FiniteStateMachine extends Agent{
 		}
 		public void action() {
 			System.out.println("Action E");
+		}
+		public int onEnd() {
+			return (int) (Math.random()*4);
 		}
 	}
 //	Comportement F
@@ -61,63 +79,32 @@ public class FiniteStateMachine extends Agent{
 			System.out.println("Action F");
 		}
 	}
-//	 définit ici une fonction afin d'utiliser les pouvoirs de la récursirvité
-	public void execution(String boucle) {
-//		Ce que doit exécuter l'algorithme après avoir fait C (deux boucles)
-		if(boucle == "c") {
-			while(decision == 0);{
-				Seq.addSubBehaviour(new OneShotC(this));
-				decision = randomiser(3);
-			}
-		}
-		if(boucle == "abc") {
-			while(decision == 1){
-				Seq.addSubBehaviour(new OneShotA(this));
-				Seq.addSubBehaviour(new OneShotB(this));
-				Seq.addSubBehaviour(new OneShotC(this));
-				decision = randomiser(3);
-				execution("c");
-			};
-		}
-//		Ce que doit exécuter l'algorithme après avoir fait E (une boucle)
-		if(boucle == "bcde") {
-			while(decision!=3) {
-				Seq.addSubBehaviour(new OneShotB(this));
-				Seq.addSubBehaviour(new OneShotC(this));
-				decision = randomiser(3);
-				execution("c");
-				execution("abc");
-				Seq.addSubBehaviour(new OneShotD(this));
-				Seq.addSubBehaviour(new OneShotE(this));
-				decision = randomiser(4);
-				execution("bcde");
-			}
-		}
-	}
 	
-//	prend un entier a et renvoie un entier aléatoire entre [0; a-1]
-	public int randomiser(int a) {
-		int b = (int) (Math.random()*a);
-//		System.out.println("Décision vaut : " + b);
-		return b;
-	}
-//	UTILISER UN FSMBEHAVIOUR
-	SequentialBehaviour Seq = new SequentialBehaviour(this);
-	int decision;
 	public void setup() {
-		Seq.addSubBehaviour(new OneShotA(this));
-		Seq.addSubBehaviour(new OneShotB(this));
-		Seq.addSubBehaviour(new OneShotC(this));
-		decision = randomiser(3);
-		execution("c");
-		execution("abc");
-		Seq.addSubBehaviour(new OneShotD(this));
-		Seq.addSubBehaviour(new OneShotE(this));
-		decision = randomiser(4);
-		execution("bcde");
-		Seq.addSubBehaviour(new OneShotF(this));
-			
-		addBehaviour(Seq);
+//		On instancie un comportement assez puissant qui exécute d'autre comportement avec un ordre qui peut être complexe qu'on peut définir facilement
+		FSMBehaviour FiniteStateMachineBehaviour = new FSMBehaviour(this);
+		FiniteStateMachineBehaviour.registerFirstState(new OneShotA(this), "A");
+		FiniteStateMachineBehaviour.registerState(new OneShotB(this), "B");
+		FiniteStateMachineBehaviour.registerState(new OneShotC(this), "C");
+		FiniteStateMachineBehaviour.registerState(new OneShotD(this), "D");
+		FiniteStateMachineBehaviour.registerState(new OneShotE(this), "E");
+		FiniteStateMachineBehaviour.registerLastState(new OneShotF(this), "F");
+		
+//		On définit les conditions pour passer d'un comportement à un autre
+//		On pass de A à B seulement si onEnd de A retourn 9
+		FiniteStateMachineBehaviour.registerTransition("A", "B", 9);
+		FiniteStateMachineBehaviour.registerTransition("B", "C", 9);
+		FiniteStateMachineBehaviour.registerTransition("C", "C", 0);
+		FiniteStateMachineBehaviour.registerTransition("C", "A", 1);
+		FiniteStateMachineBehaviour.registerTransition("C", "D", 2);
+		FiniteStateMachineBehaviour.registerTransition("D", "E", 9);
+		FiniteStateMachineBehaviour.registerTransition("E", "A", 0);
+		FiniteStateMachineBehaviour.registerTransition("E", "A", 1);
+		FiniteStateMachineBehaviour.registerTransition("E", "A", 2);
+		FiniteStateMachineBehaviour.registerTransition("E", "F", 3);
+		
+		addBehaviour(FiniteStateMachineBehaviour);
+		
 	}
 	
 }
