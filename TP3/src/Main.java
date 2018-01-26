@@ -6,7 +6,7 @@ import jade.wrapper.StaleProxyException;
 public class Main {
 
 	public static void main(String[] args) {
-	
+		
 //		Création de l'environnement
 		jade.core.Runtime rt = jade.core.Runtime.instance();
 //		Création du main container nommé POSSAMAI (1 on paramètre le constructeur, 2 on construit)
@@ -24,51 +24,44 @@ public class Main {
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}
-		
-//		----Exercice I-1)----
+
+
+//		---Exercice I)----
 //		AgentController Agent1;
 //		try {
-//			Agent1 = mc.createNewAgent("TIME", "mesAgents.TIME", null);
+//			Agent1 = mc.createNewAgent("PingAgent", "mesAgents.PingAgent", null);
 //			Agent1.start();
 //		} catch (StaleProxyException e) {
 //			e.printStackTrace();
 //		}
-		
-//		----Exercice I-2)----
-//		AgentController Agent2;
-//		try {
-//			Agent2 = mc.createNewAgent("IAMSIMPLE", "mesAgents.IAMSIMPLE", null);
-//			Agent2.start();
-//		} catch (StaleProxyException e) {
-//			e.printStackTrace();
-//		}
-		
 //		----Exercice II)----
-//		AgentController Agent3;
+//		AgentController A;
+//		AgentController B;
 //		try {
-//			Agent3 = mc.createNewAgent("TimeAgent", "mesAgents.TimeAgent", null);
-//			Agent3.start();
+//			A = mc.createNewAgent("A", "mesAgents.AgentA", null);
+//			A.start();
+//			B = mc.createNewAgent("B", "mesAgents.AgentB", null);
+//			B.start();
 //		} catch (StaleProxyException e) {
 //			e.printStackTrace();
 //		}
-		
-//		----Exercice III)----
-//		AgentController Agent4;
+//		----Exercice III-1)----
+//		AgentController BlockingRecieveAgentInstance;
 //		try {
-//			Agent4 = mc.createNewAgent("ComplexBehaviourAgent", "mesAgents.ComplexBehaviourAgent", null);
-//			Agent4.start();
+//			BlockingRecieveAgentInstance = mc.createNewAgent("BlockingReceive", "mesAgents.BlockingReceiveAgent", null);
+//			BlockingRecieveAgentInstance.start();
 //		} catch (StaleProxyException e) {
 //			e.printStackTrace();
 //		}
-		
-//		---Exercice IV)---
-		AgentController Agent5;
+//		----Exercice III-2)----
+		AgentController CustomTemplateAgent;
 		try {
-			Agent5 = mc.createNewAgent("FiniteStateMachine", "mesAgents.FiniteStateMachine", null);
-			Agent5.start();
+			CustomTemplateAgent = mc.createNewAgent("CustomTemplateAgent", "mesAgents.CustomTemplateAgent", null);
+			CustomTemplateAgent.start();
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}
+						
 	}
-
+	
 }

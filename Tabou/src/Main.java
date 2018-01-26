@@ -1,6 +1,7 @@
 import java.util.*;
 
 public class Main {
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		
 		List<List<Integer>> sOpt = new ArrayList<List<Integer>>();

@@ -6,7 +6,7 @@ import jade.wrapper.StaleProxyException;
 public class Main {
 
 	public static void main(String[] args) {
-	
+		
 //		Création de l'environnement
 		jade.core.Runtime rt = jade.core.Runtime.instance();
 //		Création du main container nommé POSSAMAI (1 on paramètre le constructeur, 2 on construit)
@@ -25,50 +25,44 @@ public class Main {
 			e.printStackTrace();
 		}
 		
-//		----Exercice I-1)----
-//		AgentController Agent1;
+//		----Exercice 1-a)----
+//		AgentController P1;
+//		AgentController P2;
+//		AgentController I;
+//		
 //		try {
-//			Agent1 = mc.createNewAgent("TIME", "mesAgents.TIME", null);
-//			Agent1.start();
+//			P1 = mc.createNewAgent("P1", "mesAgents.Participant", null);
+//			P2 = mc.createNewAgent("P2", "mesAgents.Participant", null);
+//			String[] arg = {"P1","P2"};
+//			I = mc.createNewAgent("I", "mesAgents.Initiator", arg);
+//			P1.start();
+//			P2.start();
+//			I.start();
 //		} catch (StaleProxyException e) {
 //			e.printStackTrace();
 //		}
+		AgentController P1;
+		AgentController P2;
+		AgentController B;
+		AgentController I;
 		
-//		----Exercice I-2)----
-//		AgentController Agent2;
-//		try {
-//			Agent2 = mc.createNewAgent("IAMSIMPLE", "mesAgents.IAMSIMPLE", null);
-//			Agent2.start();
-//		} catch (StaleProxyException e) {
-//			e.printStackTrace();
-//		}
-		
-//		----Exercice II)----
-//		AgentController Agent3;
-//		try {
-//			Agent3 = mc.createNewAgent("TimeAgent", "mesAgents.TimeAgent", null);
-//			Agent3.start();
-//		} catch (StaleProxyException e) {
-//			e.printStackTrace();
-//		}
-		
-//		----Exercice III)----
-//		AgentController Agent4;
-//		try {
-//			Agent4 = mc.createNewAgent("ComplexBehaviourAgent", "mesAgents.ComplexBehaviourAgent", null);
-//			Agent4.start();
-//		} catch (StaleProxyException e) {
-//			e.printStackTrace();
-//		}
-		
-//		---Exercice IV)---
-		AgentController Agent5;
 		try {
-			Agent5 = mc.createNewAgent("FiniteStateMachine", "mesAgents.FiniteStateMachine", null);
-			Agent5.start();
+			P1 = mc.createNewAgent("P1", "mesAgents.Participant", null);
+			P2 = mc.createNewAgent("P2", "mesAgents.Participant", null);
+			String[] argB = {"P1","P2"};
+			B = mc.createNewAgent("B", "mesAgents.BrokerAgent", argB);
+			String[] argI = {"B"};
+			I = mc.createNewAgent("I", "mesAgents.Initiator", argI);
+			P1.start();
+			P2.start();
+			B.start();
+			I.start();
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}
+		
+		
+		
+		
 	}
-
 }

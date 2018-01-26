@@ -4,6 +4,7 @@ import jade.core.*;
 
 //extends permet de définir la classe HelloWorld comme une classe de type
 //Agent (possible grâce à l'import, Agent € jade.core)
+@SuppressWarnings("serial")
 public class HelloWorld extends Agent{
 
 	//protected : en dehors du package on ne peut pas y accéder
