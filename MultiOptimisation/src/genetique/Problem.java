@@ -168,8 +168,7 @@ public class Problem {
 		// Lists initialization
 		int[] bests = new int[optimizer.max_generations + 1];
 		
-		// Start time
-		long startTime = System.currentTimeMillis();
+
 		
 		// Lists' first value
 		int i = 0;

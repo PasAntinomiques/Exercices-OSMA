@@ -3,52 +3,78 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import general.Cities;
 
-import java.util.Collections;
 import java.lang.Math;
 import java.util.*;
 import general.Cities;
 
+@SuppressWarnings("unused")
 public class recuit {
 	public static int k = 0;
 	
 	public static int[][] M;
 
-	public static void recuitMain(Cities cities) {
-		
-	M = cities.get_dist();
-	ArrayList<Integer> chemin = genererChemin(M.length);
-	double t = 10000;
-	double a = 0.99;
-	int nbIterMax = 400;
-	ArrayList<Integer> sol = algo(chemin, t, a, nbIterMax);
-	System.out.println(sol);
-	System.out.println(k);
-	System.out.println(calculChemin(sol));
 	
-	ArrayList<Integer> chemin2 = new ArrayList<Integer>(Arrays.asList(0,7,37,30,43,17,6,27,5,36,18,26,16,42,29,35,45,32,19,46,20,31,38,47,4,41,23,9,44,34,3,25,1,28,33,40,15,21,2,22,13,24,12,10,11,14,39,8));
-	System.out.println(chemin2.size());
-	System.out.println(calculChemin(chemin2));
-			
-	afficher(etudeStat(10000, 100, 0.99, 10, 45000));
+	private static int[] toIntArray(List<Integer> list){
+		
+		  int[] ret = new int[list.size()];
+		  for(int i = 0;i < ret.length;i++)
+		    ret[i] = list.get(i);
+		  return ret;
+		}
+	private static ArrayList<Integer> arrayToList(int[] sTab){
+		ArrayList<Integer> sList = new ArrayList<Integer>();
+		  for(int i = 0;i < sTab.length;i++) {
+			   sList.add(sTab[i]);
+		  }
+		    
+		return sList;
+	}
+	public static Object[] recuitMain(Cities cities) {
+		
+		M = cities.get_dist();
+		ArrayList<Integer> chemin = genererChemin(M.length);
+		double t = 10000;
+		double a = 0.99;
+		int nbIterMax = 400;
+		ArrayList<Integer> sol = algo(chemin, t, a, nbIterMax);
+		int [] solTab = toIntArray(sol);
+		int distance = calculChemin(sol);
+		Object[] tab = {solTab,distance};
+		return tab;
+	//	System.out.println(sol);
+	//	System.out.println(k);
+	//	System.out.println(calculChemin(sol));
+		
+	//	ArrayList<Integer> chemin2 = new ArrayList<Integer>(Arrays.asList(0,7,37,30,43,17,6,27,5,36,18,26,16,42,29,35,45,32,19,46,20,31,38,47,4,41,23,9,44,34,3,25,1,28,33,40,15,21,2,22,13,24,12,10,11,14,39,8));
+	//	System.out.println(chemin2.size());
+	//	System.out.println(calculChemin(chemin2));
+				
+	//	afficher(etudeStat(10000, 100, 0.99, 10, 45000));
 
 	}
-	public static void recuitMain(Cities cities, ArrayList<Integer> cheminTab) {
-		
-	M = cities.get_dist();
-	ArrayList<Integer> chemin = genererChemin(M.length);
-	double t = 10000;
-	double a = 0.99;
-	int nbIterMax = 400;
-	ArrayList<Integer> sol = algo(chemin, t, a, nbIterMax);
-	System.out.println(sol);
-	System.out.println(k);
-	System.out.println(calculChemin(sol));
 	
-	ArrayList<Integer> chemin2 = new ArrayList<Integer>(Arrays.asList(0,7,37,30,43,17,6,27,5,36,18,26,16,42,29,35,45,32,19,46,20,31,38,47,4,41,23,9,44,34,3,25,1,28,33,40,15,21,2,22,13,24,12,10,11,14,39,8));
-	System.out.println(chemin2.size());
-	System.out.println(calculChemin(chemin2));
+	public static Object[] recuitMain(Cities cities, int[] cheminTab) {
 			
-//	afficher(etudeStat(10000, 100, 0.99, 10, 45000));
+		M = cities.get_dist();
+		ArrayList<Integer> chemin = arrayToList(cheminTab);
+		double t = 10000;
+		double a = 0.99;
+		int nbIterMax = 400;
+		ArrayList<Integer> sol = algo(chemin, t, a, nbIterMax);
+		
+		int [] solTab = toIntArray(sol);
+		int distance = calculChemin(sol);
+		Object[] tab = {solTab,distance};
+		return tab;
+//		System.out.println(sol);
+//		System.out.println(k);
+//		System.out.println(calculChemin(sol));
+//		
+//		ArrayList<Integer> chemin2 = new ArrayList<Integer>(Arrays.asList(0,7,37,30,43,17,6,27,5,36,18,26,16,42,29,35,45,32,19,46,20,31,38,47,4,41,23,9,44,34,3,25,1,28,33,40,15,21,2,22,13,24,12,10,11,14,39,8));
+//		System.out.println(chemin2.size());
+//		System.out.println(calculChemin(chemin2));
+				
+//		afficher(etudeStat(10000, 100, 0.99, 10, 45000));
 
 	}
 	
