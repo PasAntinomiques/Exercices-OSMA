@@ -7,23 +7,28 @@ import jade.core.Agent;
 
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
 import tabou.taboulet;
 import genetique.Problem;
 import genetique.Individual;
+
+import java.io.IOException;
+
 import general.Cities;
 import recuit.recuit;
 
 @SuppressWarnings("serial")
 public class AgentOptimisation extends Agent{
 	
-	private static int nombreDeCorrespondants;
-	private static Object[] args;	
-	private static int cout;
-	private static int [] meilleureSol;
-	private static Cities cities = new Cities();
-	private static int[][] M = cities.get_dist();
-	private static int nbIt = 0;
-	private static int nbItMax;
+	private int nombreDeCorrespondants;
+	private Object[] args;
+	private Cities cities = new Cities();
+	private int[][] M = cities.get_dist();
+	private int nbIt = 0;
+	private int nbItMax;
+	private int cout;
+	private int [] instantSol=new int[cities.get_num()-1];
+	private int [] meilleureSol=new int[cities.get_num()-1];
 	
 	
 	private class optimisationInitialisation extends OneShotBehaviour{
@@ -31,7 +36,6 @@ public class AgentOptimisation extends Agent{
 			super(a);
 		}
 		public void action() {
-			
 //			Argument 0 fournit à cet agent définit le type d'algorithme d'optimisation
 			String type = (String)args[0];
 			
@@ -39,25 +43,39 @@ public class AgentOptimisation extends Agent{
 				case"tabou":{
 //					Ici on exécute le main de tabou
 					Object[] best = taboulet.tabou(cities);
-					meilleureSol =(int[])best[0];
-					cout = (int)best[1];
+					instantSol=(int[])best[0];
+					cout = distance(instantSol);
+					meilleureSol=instantSol.clone();			
 					break;
 				}
 				case"recuit":{
 //					Ici on exécute le main de recuit
 					Object[] best = recuit.recuitMain(cities);
-					meilleureSol =(int[])best[0];
-					cout = (int)best[1];
+					instantSol=(int[])best[0];
+					cout = distance(instantSol);
+					meilleureSol=instantSol.clone();		
 					break;
 				}
 				case"genetique":{
 //					Ici on exécute le main de genetique
 					Individual best = Problem.principal(cities);
-					meilleureSol = best.get_chromosome();
-					cout = best.get_cost();
+					instantSol=best.get_chromosome();
+					cout = distance(instantSol);
+					meilleureSol=instantSol.clone();		
 					break;
 				}
 			}
+			System.out.println("Agent "+getLocalName()+" : Processing done, sending result : "+cout);
+			ACLMessage result = new ACLMessage(ACLMessage.INFORM);
+			for(int i=2;i<args.length;i++) {
+				result.addReceiver(new AID((String)args[i],AID.ISLOCALNAME));
+			}
+			try {
+				result.setContentObject(instantSol);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			myAgent.send(result);
 		}
 		public int onEnd() {
 			nbIt++;
@@ -74,53 +92,42 @@ public class AgentOptimisation extends Agent{
 			switch(type) {
 				case"tabou":{
 //					Ici on exécute le main de tabou
-					Object[] best = taboulet.tabou(cities, meilleureSol);
-					meilleureSol =(int[])best[0];
-					cout = (int)best[1];
+					Object[] best = taboulet.tabou(cities, instantSol);
+					instantSol=(int[])best[0];
+					cout = distance(instantSol);
 					break;
 				}
 				case"recuit":{
 //					Ici on exécute le main de recuit
-					Object[] best = recuit.recuitMain(cities, meilleureSol);
-					meilleureSol =(int[])best[0];
-					cout = (int)best[1];
+					Object[] best = recuit.recuitMain(cities, instantSol);
+					instantSol=(int[])best[0];
+					cout = distance(instantSol);
 					break;
 				}
 				case"genetique":{
 //					Ici on exécute le main de genetique
-					Individual best = Problem.principal(cities, meilleureSol);
-					meilleureSol = best.get_chromosome();
-					cout = best.get_cost();
+					Individual best = Problem.principal(cities, instantSol);
+					instantSol=best.get_chromosome();
+					cout = distance(instantSol);
 					break;
 				}
 			}
-			
-		}
-		public int onEnd() {
-			nbIt++;
-			return 1;
-		}
-	}
-	
-	private class envoieBehaviour extends OneShotBehaviour{
-		private envoieBehaviour(Agent a) {
-			super(a);
-		}
-		public void action() {
 			System.out.println("Agent "+getLocalName()+" : Processing done, sending result : "+cout);
 			ACLMessage result = new ACLMessage(ACLMessage.INFORM);
 			for(int i=2;i<args.length;i++) {
 				result.addReceiver(new AID((String)args[i],AID.ISLOCALNAME));
 			}
-			String content = Integer.toString(meilleureSol[0]);
-			for(int i=1;i<meilleureSol.length;i++) {
-				content += " ";
-				content += Integer.toString(meilleureSol[i]);
+			try {
+				result.setContentObject(instantSol);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			result.setContent(content);
 			myAgent.send(result);
+			nbIt++;
+			
 		}
 		public int onEnd() {
+			nbIt++;
 			return 1;
 		}
 	}
@@ -132,45 +139,25 @@ public class AgentOptimisation extends Agent{
 		}
 		public void action() {
 			int nbMessages = 0;
-			int[][] resultats = new int[(nombreDeCorrespondants+1)][];
-			int[] coutResultats = new int[(nombreDeCorrespondants+1)];
-			resultats[0] = meilleureSol;
-			coutResultats[0] = distance(meilleureSol); 
-			String contenu;
+			int[][] resultats = new int[(nombreDeCorrespondants+2)][];
+			resultats[0]=instantSol;
+			resultats[1]=meilleureSol;
 			while(nbMessages<nombreDeCorrespondants) {
 				ACLMessage msg = myAgent.receive();
 				if(msg != null) {
-					if(msg.getSender().getName()!=myAgent.getName()) {
-						System.out.println("Agent "+myAgent.getLocalName()+" : Receiving results from : "+msg.getSender().getLocalName());
-						contenu = msg.getContent();
-						
-//						Processing content
-						String subContent ="";
-						int k=0;
-						for(int i=0;i<contenu.length();i++) {
-							if(String.valueOf(contenu.charAt(i))!=" ") {
-								subContent +=String.valueOf(contenu.charAt(i));  
-							}else {
-								resultats[(nbMessages+1)][k]=Integer.parseInt(subContent);
-								k=k+1;
-								subContent="";
-							}
-						}
-						nbMessages++;
-						System.out.print(nbMessages+" et "+ nombreDeCorrespondants);
+					try {
+						resultats[(nbMessages+2)]=(int[])msg.getContentObject();
+//						System.out.println("Agent "+myAgent.getLocalName()+" : Receiving results from : "+msg.getSender().getLocalName());
+					} catch (UnreadableException e) {
+						e.printStackTrace();
 					}
-					else {
-						block();
-					}
+					nbMessages++;
 				}else {
 					block();
 				}
 			}
-			System.out.println("Balise 1");
+//			Fonction choix
 			if(nbMessages == nombreDeCorrespondants) {
-//				System.out.println(resultats[0].length);
-//				System.out.println(resultats[1].length);
-//				System.out.println(resultats[2].length);
 				int temp = distance(resultats[0]);
 				int indTemp = 0;
 				for(int i=1;i<resultats.length;i++) {
@@ -180,7 +167,8 @@ public class AgentOptimisation extends Agent{
 			 		}
 			 	}
 				System.out.println("Agent "+getLocalName()+" : Choosing : "+temp);
-				meilleureSol = resultats[indTemp];
+				instantSol=resultats[indTemp].clone();
+				meilleureSol=instantSol.clone();
 				cout = temp;
 			}
 		}
@@ -204,35 +192,31 @@ public class AgentOptimisation extends Agent{
 	}
 	
 	private int distance(int[] s) {
-		int S = M[0][s[0]];
+		int S = M[cities.get_start_city()][s[0]];
 		for(int i=0;i<s.length-1;i++) {
 			S += M[s[i]][s[i+1]];
 		}
-		S += M[s[s.length-1]][0];
+		S += M[s[s.length-1]][cities.get_start_city()];
 		return S;
 	}
+	
 	protected void setup() {
-		
-		args = getArguments();
+		args = this.getArguments();
 		nbItMax = (int)args[1];
 //		Convetit les arguments en chaîne de caractères
 		nombreDeCorrespondants=args.length-2;
-		System.out.println("Agent "+getLocalName()+" : Online ! Communicating with : "+nombreDeCorrespondants);
-
-		
+		System.out.println("Agent "+getLocalName()+" : Online ! Communicating with : "+nombreDeCorrespondants);		
 		
 		FSMBehaviour order = new FSMBehaviour(this);
 		order.registerFirstState(new optimisationInitialisation(this), "initialisation");
-		order.registerState(new envoieBehaviour(this), "envoie");
 		order.registerState(new ecouteBehaviour(this), "ecoute");
 		order.registerState(new optimisation(this), "optimisation");
-		order.registerLastState(new envoieBehaviour(this), "finish");
+		order.registerLastState(new terminateBehaviour(this), "finish");
 		
-		order.registerTransition("initialisation", "envoie", 1);
-		order.registerTransition("envoie", "ecoute", 1);
-		order.registerTransition("ecoute", "optimisation", 1);
-		order.registerTransition("optimisation", "envoie", 1);
+		order.registerTransition("initialisation", "ecoute", 1);
 		order.registerTransition("ecoute", "finish", 0);
+		order.registerTransition("ecoute", "optimisation", 1);
+		order.registerTransition("optimisation", "ecoute", 1);
 		addBehaviour(order);
 
 	}
