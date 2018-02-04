@@ -1,7 +1,6 @@
 package mesAgents;
 
 import jade.core.AID;
-
 import jade.core.Agent;
 
 
@@ -15,7 +14,7 @@ import genetique.Individual;
 import java.io.IOException;
 
 import general.Cities;
-import recuit.recuit;
+import recuit.Recuit;
 
 @SuppressWarnings("serial")
 public class AgentOptimisation extends Agent{
@@ -50,8 +49,7 @@ public class AgentOptimisation extends Agent{
 				}
 				case"recuit":{
 //					Ici on exécute le main de recuit
-					Object[] best = recuit.recuitMain(cities);
-					instantSol=(int[])best[0];
+					instantSol=Recuit.recuit(cities);
 					cout = distance(instantSol);
 					meilleureSol=instantSol.clone();		
 					break;
@@ -91,21 +89,20 @@ public class AgentOptimisation extends Agent{
 			String type = (String)args[0];
 			switch(type) {
 				case"tabou":{
-//					Ici on exécute le main de tabou
+//					Ici on exécute le main de tabou en partant d'une solution admissible
 					Object[] best = taboulet.tabou(cities, instantSol);
 					instantSol=(int[])best[0];
 					cout = distance(instantSol);
 					break;
 				}
 				case"recuit":{
-//					Ici on exécute le main de recuit
-					Object[] best = recuit.recuitMain(cities, instantSol);
-					instantSol=(int[])best[0];
+//					Ici on exécute le main de recuit en partant d'une solution admissible
+					instantSol=Recuit.recuit(cities, instantSol);
 					cout = distance(instantSol);
 					break;
 				}
 				case"genetique":{
-//					Ici on exécute le main de genetique
+//					Ici on exécute le main de genetique en partant d'une solution admissible
 					Individual best = Problem.principal(cities, instantSol);
 					instantSol=best.get_chromosome();
 					cout = distance(instantSol);
@@ -147,7 +144,7 @@ public class AgentOptimisation extends Agent{
 				if(msg != null) {
 					try {
 						resultats[(nbMessages+2)]=(int[])msg.getContentObject();
-//						System.out.println("Agent "+myAgent.getLocalName()+" : Receiving results from : "+msg.getSender().getLocalName());
+						System.out.println("Agent "+myAgent.getLocalName()+" : Receiving results from : "+msg.getSender().getLocalName());
 					} catch (UnreadableException e) {
 						e.printStackTrace();
 					}

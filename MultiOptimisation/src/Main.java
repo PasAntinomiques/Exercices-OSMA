@@ -30,14 +30,14 @@ public class Main {
 		int MaxIteration = 1000;
 		
 		try {
-			Object[] argsGenetique = {"genetique",MaxIteration,"genetique2","genetique3"};
+			Object[] argsGenetique = {"genetique",MaxIteration,"recuit","genetique2"};
 			genetique = mc.createNewAgent("genetique1", "mesAgents.AgentOptimisation", argsGenetique);
 			
-			Object[] argsRecuit = {"genetique",MaxIteration,"genetique1","genetique3"};
-			recuit = mc.createNewAgent("genetique2", "mesAgents.AgentOptimisation", argsRecuit);
+			Object[] argsRecuit = {"recuit",MaxIteration,"genetique1","genetique2"};
+			recuit = mc.createNewAgent("recuit", "mesAgents.AgentOptimisation", argsRecuit);
 			
-			Object[] argsTabou = {"genetique",MaxIteration,"genetique1","genetique2"};
-			tabou = mc.createNewAgent("genetique3", "mesAgents.AgentOptimisation", argsTabou);
+			Object[] argsTabou = {"genetique",MaxIteration,"genetique1","recuit"};
+			tabou = mc.createNewAgent("genetique2", "mesAgents.AgentOptimisation", argsTabou);
 			
 			genetique.start();
 			recuit.start();
