@@ -5,14 +5,24 @@ import java.util.*;
 import general.Cities;
 
 public class taboulet {
-	public static int[][] M;
-	public static int tailleM;
 	
-	public static Object[] tabou (Cities cities) {
+	public taboulet(Cities cities) {
+		super(cities);
+	}
+	
+	
+	
+	public int[][] M;
+	public int tailleM;
+	
+	public class solution{
+		public int[] tab = new int[(tailleM-1)];
+		public int dist=distance(tab);
+	}
+	
+	public Object[] tabou (Cities cities) {
 		M = cities.get_dist();
 		tailleM = cities.get_num();
-		
-		//long debut = System.currentTimeMillis(); // pour mesurer la durée d'execution du programme
 		
 		List<Integer> s = solAdm(); // création d'une solution admissible
 		int d = distance(s); //distance de s
@@ -125,7 +135,7 @@ public class taboulet {
 		return solFinale;
 	}
 	
-	public static Object[] tabou (Cities cities, int[] sTab) {
+	public Object[] tabou (Cities cities, int[] sTab) {
 	
 		M = cities.get_dist();
 		tailleM = cities.get_num();
@@ -245,7 +255,7 @@ public class taboulet {
 	
 	
 	
-	private static List<Integer> arrayToList(int[] sTab){
+	private List<Integer> arrayToList(int[] sTab){
 		List<Integer> sList = new ArrayList<Integer>();
 		  for(int i = 0;i < sTab.length;i++) {
 			   sList.add(sTab[i]);
@@ -254,7 +264,7 @@ public class taboulet {
 		return sList;
 	}
 	
-	private static int[] toIntArray(List<Integer> list){
+	private int[] toIntArray(List<Integer> list){
 		
 		  int[] ret = new int[list.size()];
 		  for(int i = 0;i < ret.length;i++)
@@ -262,35 +272,8 @@ public class taboulet {
 		  return ret;
 		}
 	
-	
-	
-	
-//	public static int M [][] = { 
-//			   {0, 300 ,352 ,466, 217, 238, 431, 336, 451 , 47, 415 ,515},    //Matrice des distances
-//			   {300  , 0, 638, 180, 595 ,190, 138, 271, 229, 236, 214 ,393},  //pour aller d'une ville
-//			   {352, 638,   0 ,251,  88, 401 ,189, 386, 565, 206, 292, 349},  //à une autre
-//			   {466, 180, 251 ,  0, 139, 371, 169, 316, 180, 284, 206, 198},
-//			   {217, 595 , 88 ,139  , 0 ,310, 211, 295, 474, 130 ,133, 165},
-//			   {238, 190, 401, 371, 310 ,  0 ,202, 122, 378, 157 ,362, 542},
-//			   {431 ,138 ,189, 169 ,211, 202 ,  0 ,183,  67, 268, 117, 369},
-//			   {336, 271 ,386, 316, 295 ,122, 183 ,  0, 483 ,155, 448, 108},
-//			   {451, 229, 565 ,180, 474 ,378 , 67, 483,   0 ,299, 246, 418},
-//			   {47 ,236, 206 ,284 ,130, 157 ,268, 155 ,299 ,  0, 202, 327},
-//			   {415, 214, 292 ,206, 133, 362 ,117 ,448, 246, 202,   0, 394},
-//			   {515, 393, 349, 198, 165, 542, 368, 108, 418, 327, 394,   0}};
-	
-//	public static int M[][] = {{0,780,320,580,480,660},
-//			 					{780,0,700,460,300,200},
-//			 					{320,700,0,380,820,630},
-//			 					{580,460,380,0,750,310},
-//			 					{480,300,820,750,0,500},
-//			 					{660,200,630,310,500,0}};
-	
-
-	
-	
 	//Création d'une solution admissible
-		public static List<Integer> solAdm() {
+		public List<Integer> solAdm() {
 			List<Integer> sol = new ArrayList<Integer>();
 			for(int i=1; i<tailleM;  i++) {
 				sol.add(i);
@@ -301,9 +284,9 @@ public class taboulet {
 
 	
 	//Attribue à un trajet la distance totale
-	public static int distance(List<Integer> s ) {
-		int tailleS = s.size();
-		int d=M[s.get (0)][0];
+	public int distance(int[] s) {
+		int tailleS = s.length;
+		int d=M[s.get (0)][M.];
 		for (int i = 0; i< (tailleS - 1); i++) {
 			d += M[s.get(i)][s.get(i+1)];
 		}
@@ -312,7 +295,7 @@ public class taboulet {
 	}
 	
 	//Fonction qui génère l'espace N qui contient les voisins de s ainsi que le déplacement nécéssaire pour y aller à partir de s
-	public static List<List<List<Integer>>> voisinGenerator(List<Integer> s){
+	public List<List<List<Integer>>> voisinGenerator(List<Integer> s){
 		// les voisins sont tous les solutions différentes où l'ont peut intervertir deux villes dans s
 		List<List<List<Integer>>> N = new ArrayList<List<List<Integer>>>();
 		List<List<Integer>> N0 = new ArrayList<List<Integer>>();
@@ -338,7 +321,7 @@ public class taboulet {
 		return N;
 	}
 
-	public static void AfficherS(List<Integer> s){
+	public void AfficherS(List<Integer> s){
 		for (int i=0;i<s.size();i++){
 			System.out.println(s.get(i));
 		}		
@@ -359,7 +342,7 @@ public class taboulet {
 		return s;
 	} */
 	
-	public static List<Integer> Aspiration(List<Integer> s){ // on mélange les trois éléments du milieu de s
+	public List<Integer> Aspiration(List<Integer> s){ // on mélange les trois éléments du milieu de s
 		Collections.shuffle(s);
 		return s;
 	}
