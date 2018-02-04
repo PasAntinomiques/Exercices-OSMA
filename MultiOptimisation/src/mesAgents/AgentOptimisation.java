@@ -10,7 +10,6 @@ import jade.lang.acl.UnreadableException;
 import tabou.taboulet;
 import genetique.Problem;
 import genetique.Individual;
-
 import java.io.IOException;
 
 import general.Cities;
@@ -41,7 +40,7 @@ public class AgentOptimisation extends Agent{
 			switch(type) {
 				case"tabou":{
 //					Ici on exécute le main de tabou
-					Object[] best = taboulet.tabou(cities);
+					solution best = taboulet.;
 					instantSol=(int[])best[0];
 					cout = distance(instantSol);
 					meilleureSol=instantSol.clone();			
