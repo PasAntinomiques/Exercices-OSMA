@@ -40,8 +40,8 @@ public class AgentOptimisation extends Agent{
 			switch(type) {
 				case"tabou":{
 //					Ici on exécute le main de tabou
-					solution best = taboulet.;
-					instantSol=(int[])best[0];
+					taboulet t = new taboulet();
+					instantSol = t.tabou(cities);
 					cout = distance(instantSol);
 					meilleureSol=instantSol.clone();			
 					break;
@@ -89,8 +89,8 @@ public class AgentOptimisation extends Agent{
 			switch(type) {
 				case"tabou":{
 //					Ici on exécute le main de tabou en partant d'une solution admissible
-					Object[] best = taboulet.tabou(cities, instantSol);
-					instantSol=(int[])best[0];
+					taboulet t = new taboulet();
+					instantSol = t.tabou(cities, instantSol);
 					cout = distance(instantSol);
 					break;
 				}

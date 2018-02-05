@@ -1,351 +1,262 @@
 package tabou;
 
-import java.util.ArrayList;
 import java.util.*;
 import general.Cities;
 
 public class taboulet {
 	
-	public taboulet(Cities cities) {
-		super(cities);
-	}
+	private Cities city;
+	private int[][] M;
+	private int tailleM;
+//	 nombre max d'itération dans la boucle de calcul
+	public int nbMax = 1000; 
+//	 compteur du nombre d'itération
+	public int nbIter = 0; 
+//	 nombre d'itération ayant conduit à la meilleure solution jusque là
+	public int meilIter = 0;
+//	taille de la liste tabou, à déterminer expérimentalement (entre 7 et 20) (doit être impair cf ligne 188)
+	public int tailleDeT = 20;
+//	le nombre de voisin d'une solution s
+	private int nombreDeVoisin;
 	
-	
-	
-	public int[][] M;
-	public int tailleM;
-	
-	public class solution{
+	private class solution{
+//		tableau contenant l'ordre des villes
 		public int[] tab = new int[(tailleM-1)];
-		public int dist=distance(tab);
-	}
-	
-	public Object[] tabou (Cities cities) {
-		M = cities.get_dist();
-		tailleM = cities.get_num();
-		
-		List<Integer> s = solAdm(); // création d'une solution admissible
-		int d = distance(s); //distance de s
-		
-		List<Integer> sMin = s; //initialisation de la solution ayant la distance minimale finale
-		int dMin = d;
-		
-		int nbMax = 100000; // nombre max d'itération dans la boucle de calcul
-		int nbIter = 0; // compteur du nombre d'itération
-		int meilIter = 0;	// nombre d'itération ayant conduit à la meilleure solution jusque là
-		
-		List<List<Integer>> T = new ArrayList<List<Integer>>(); // liste taboue vide initialement, contient les déplacements tabous
-		int tailleT=20; // la taille max de T est de 20
-		
-		List<List<List<Integer>>> N = new ArrayList<List<List<Integer>>>(); // espace N contenant les solutions voisines de s et leurs déplacement
-		
-		//MANQUE initialisation de la fonction d'aspiration A
-		
-		while (d>=dMin && nbIter-meilIter < nbMax) {
-			nbIter ++;
-			
-			N=voisinGenerator(s);
-			
-			List<Integer> sAspire = Aspiration(s);
-			int dAspire = distance(sAspire);
-			
-			List<Integer> sPrime1 = N.get(0).get(0);
-			int dPrime1 = distance(sPrime1);
-			List<Integer> mouvement1 = N.get(1).get(0);
-			boolean aspired1 = false;
-			for(int i=0;i<N.size();i++){ //On choisit la solution la plus courte de N' et qui est plus courte que la solution aspirée
-				if(distance(N.get(0).get(i))<=dAspire && dPrime1<d){
-					sPrime1=N.get(0).get(i);
-					dPrime1=distance(sPrime1);
-					mouvement1 = N.get(1).get(i);
-				}
-				else{ // si elle n'existe pas on aspire
-					sPrime1=sAspire;
-					dPrime1=dAspire;
-					aspired1=true;
+//		distance totale du trajet
+		public int dist;
+//		génère une solution admissible aléatoire
+		public void generation() {
+			int i = 0;
+			for (int t:city.get_index_list()) {
+				if (t != city.get_start_city() ) { 
+					tab[i] = t;
+					i++;		
 				}
 			}
-			
-			List<Integer> sPrime2 = sAspire; //sPrime2 meilleure solution hors tabou
-			int dPrime2 = dAspire;			//si toutes les solutions sont dans tabou on aspire
-			List<Integer> mouvement2 = new ArrayList<Integer>();
-			boolean aspired2 = true;
-			boolean breaked = false;
-			List<Integer> couple = new ArrayList<Integer>();
-			for(int i=0;i<N.size();i++){
-				couple = N.get(1).get(i);
-				for(int j=0;j<T.size();j++){//initialisation de sPrime2 la meilleure solution hors tabou
-					if(couple!=T.get(j) && breaked==false) {//si on est hors tabou et que l'initialisation n'est pas terminée
-						sPrime2 = N.get(0).get(i);
-						dPrime2 = distance(sPrime2);
-						mouvement2 = N.get(1).get(i);
-						aspired2 = false;
-						breaked = true;//initialisation terminée
-						break;
-					}
-				}
-				if(breaked){//quand l'initialisation est terminée
-					for(int j=0;j<T.size();j++){ //recherche de la solution minimale hors tabou
-						if(couple!=T.get(j) && distance(N.get(0).get(i))<dPrime2){
-							sPrime2 = N.get(0).get(i);
-							dPrime2 = distance(N.get(0).get(i));
-							mouvement2 = N.get(1).get(i);
+//			 on mélange complètement et aléatoirement la liste
+			tab=shuffleTab(tab).clone();
+			dist=distance(tab);
+		}
+//		créé une solution similaire à la solution s
+		public void clone(solution s) {
+			this.dist=s.dist;
+			this.tab=s.tab.clone();
+		}
+//		déplacement en echangeant la ième ville et la jème ville
+		public solution deplacement(int i, int j) {
+			solution s=new solution();
+			s.clone(this);
+			int temp = s.tab[i];
+			s.tab[i] = s.tab[j];
+			s.tab[j]=temp;
+			return s;
+		}
+	}
+//	mélange un tableau d'entier
+	private static int[] shuffleTab(int[] s) {
+		/* shuffles a list */
+        int n = s.length;
+        Random random = new Random();
+        random.nextInt();
+        for (int i = 0; i < n; i++) {
+            int change = i + random.nextInt(n - i);
+            // on échange deux éléments
+            int helper = s[i];
+            s[i] = s[change];
+            s[change] = helper;
+        }
+        
+        return s;
+	}
+	
+//	constructeur de la liste tabou
+	private class T{
+		private int tailleT;
+		private T(int tailleT) {
+			this.tailleT=tailleT;
+			this.solutionBase = new solution[tailleT];
+			this.deplacementInterdit = new int[tailleT][2];
+		}
+//		les solutions par lequelles on est passé
+		public solution[] solutionBase = new solution[tailleT];
+//		les déplacement qu'on a fait en partant de ces solutions
+		public int[][] deplacementInterdit = new int[tailleT][2];
+//		ajout d'un déplacement tabou
+		public void addTabou(solution s, int[] deplacement) {
+			boolean sht=true;
+			for(int i=0;i<tailleT;i++) {
+//				si la liste n'est pas encore pleine
+				if(solutionBase[i]==null) {
+					solutionBase[i]=s;
+					deplacementInterdit[i]=deplacement.clone();
+					break;
+				}else {
+//					si elle est pleine on réautorise le plus ancien déplacement
+					for(int j=0;j<tailleT-1;j++) {
+						if(solutionBase[(i+1)]!=null) {
+							solutionBase[i].clone(solutionBase[(i+1)]);
+							deplacementInterdit[i]=deplacementInterdit[(i+1)].clone();
+						}else {
+							sht = false;
+							break;
 						}
 					}
-				}
-			}
-			
-			//Comparaison entre les deux solutions
-						
-			if(dPrime2<dPrime1){
-				s=sPrime2;
-				d=dPrime2;
-				if(aspired2==false){
-					T.add(mouvement2);
-				}
-			}
-			else{
-				s=sPrime1;
-				d=dPrime1;
-				if(aspired1==false){
-					T.add(mouvement1);
-				}
-			}
-			
-			if(T.size()>tailleT){
-				T.remove(0);
-			}
-			
-			if(d<dMin){
-				sMin=s;
-				dMin=d;
-				meilIter=nbIter;
-				nbIter=0;
-			}
-		}
-		//System.out.println("Solution finale");
-		//AfficherS(sMin);
-		//System.out.println("meil_iter : "+meilIter);
-		
-		//System.out.println(System.currentTimeMillis()-debut); // renvoie la durée du programme
-		
-		
-		int[] sMinTab = toIntArray(sMin);
-		Object[] solFinale = {sMinTab,dMin};
-		return solFinale;
-	}
-	
-	public Object[] tabou (Cities cities, int[] sTab) {
-	
-		M = cities.get_dist();
-		tailleM = cities.get_num();
-		
-		//long debut = System.currentTimeMillis(); // pour mesurer la durée d'execution du programme
-		
-		List<Integer> s = arrayToList(sTab); // création d'une solution admissible
-		int d = distance(s); //distance de s
-		
-		List<Integer> sMin = s; //initialisation de la solution ayant la distance minimale finale
-		int dMin = d;
-		
-		int nbMax = 100000; // nombre max d'itération dans la boucle de calcul
-		int nbIter = 0; // compteur du nombre d'itération
-		int meilIter = 0;	// nombre d'itération ayant conduit à la meilleure solution jusque là
-		
-		List<List<Integer>> T = new ArrayList<List<Integer>>(); // liste taboue vide initialement, contient les déplacements tabous
-		int tailleT=20; // la taille max de T est de 20
-		
-		List<List<List<Integer>>> N = new ArrayList<List<List<Integer>>>(); // espace N contenant les solutions voisines de s et leurs déplacement
-		
-		//MANQUE initialisation de la fonction d'aspiration A
-		
-		while (d>=dMin && nbIter-meilIter < nbMax) {
-			nbIter ++;
-			
-			N=voisinGenerator(s);
-			
-			List<Integer> sAspire = Aspiration(s);
-			int dAspire = distance(sAspire);
-			
-			List<Integer> sPrime1 = N.get(0).get(0);
-			int dPrime1 = distance(sPrime1);
-			List<Integer> mouvement1 = N.get(1).get(0);
-			boolean aspired1 = false;
-			for(int i=0;i<N.size();i++){ //On choisit la solution la plus courte de N' et qui est plus courte que la solution aspirée
-				if(distance(N.get(0).get(i))<=dAspire && dPrime1<d){
-					sPrime1=N.get(0).get(i);
-					dPrime1=distance(sPrime1);
-					mouvement1 = N.get(1).get(i);
-				}
-				else{ // si elle n'existe pas on aspire
-					sPrime1=sAspire;
-					dPrime1=dAspire;
-					aspired1=true;
-				}
-			}
-			
-			List<Integer> sPrime2 = sAspire; //sPrime2 meilleure solution hors tabou
-			int dPrime2 = dAspire;			//si toutes les solutions sont dans tabou on aspire
-			List<Integer> mouvement2 = new ArrayList<Integer>();
-			boolean aspired2 = true;
-			boolean breaked = false;
-			List<Integer> couple = new ArrayList<Integer>();
-			for(int i=0;i<N.size();i++){
-				couple = N.get(1).get(i);
-				for(int j=0;j<T.size();j++){//initialisation de sPrime2 la meilleure solution hors tabou
-					if(couple!=T.get(j) && breaked==false) {//si on est hors tabou et que l'initialisation n'est pas terminée
-						sPrime2 = N.get(0).get(i);
-						dPrime2 = distance(sPrime2);
-						mouvement2 = N.get(1).get(i);
-						aspired2 = false;
-						breaked = true;//initialisation terminée
-						break;
+					if(sht) {
+						solutionBase[tailleT-1]=s;
+						deplacementInterdit[tailleT-1]=deplacement.clone();
 					}
 				}
-				if(breaked){//quand l'initialisation est terminée
-					for(int j=0;j<T.size();j++){ //recherche de la solution minimale hors tabou
-						if(couple!=T.get(j) && distance(N.get(0).get(i))<dPrime2){
-							sPrime2 = N.get(0).get(i);
-							dPrime2 = distance(N.get(0).get(i));
-							mouvement2 = N.get(1).get(i);
+			}
+			
+		}
+//		On vérifie que ce déplacement est tabou
+		public boolean isInterdit(solution s, int[] deplacement) {
+			for(int i =0;i<tailleT;i++) {
+				if(solutionBase[i]!=null) {
+					if(solutionBase[i].equals(s) && deplacementInterdit[i].equals(deplacement)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+//		On vérifie si on est déjà passé par cette solution
+		public int isInterdit(solution s) {
+			int compt=0;
+			for(int i =0;i<tailleT;i++) {
+				if(solutionBase[i]!=null) {
+					if(solutionBase[i].equals(s)) {
+						compt++;
+					}
+				}
+			}
+			return compt;
+		}
+		
+		
+	}
+//	calcule la distance totale d'une solution s en partant de la ville de départ définie dans Cities
+	private int distance(int[] s) {
+		int S = M[city.get_start_city()][s[0]];
+		for(int i=0;i<s.length-1;i++) {
+			S += M[s[i]][s[i+1]];
+		}
+		S += M[s[s.length-1]][city.get_start_city()];
+		return S;
+	}
+	private void nbCombinaison(solution s) {
+		int compt =0;
+		for(int i=1;i<s.tab.length;i++) {
+			for(int j=0;j<i;j++) {
+				compt++;
+			}
+		}
+		nombreDeVoisin = compt;
+	}
+	
+	private class voisin{
+		private solution depart;
+		public solution[] voisins=new solution[nombreDeVoisin];
+		public int[][] deplacements=new int[nombreDeVoisin][2];
+		public voisin(solution s) {
+			this.depart=s;
+			int compt=0;
+			for(int i=1;i<depart.tab.length;i++) {
+				for(int j=0;j<i;j++) {
+					voisins[compt]=depart.deplacement(i, j);
+					deplacements[compt][0]=i;deplacements[compt][1]=j;
+					compt++;
+				}
+			}
+		}
+	}
+	
+	private solution algo(solution s) {
+		
+//		Initialisation de la liste tabou
+		T TabouTab = new T(tailleDeT);
+		solution bestSol =new solution();
+		bestSol.clone(s);
+		solution tempSol = new solution();
+		tempSol.clone(bestSol);
+		
+		while(nbIter<nbMax) {
+			nbIter++;
+			voisin Voisin = new voisin(tempSol);
+//			recherche du minimum dans tabou, si tous les chemins sont dans tabou on aspire => impossible taille de T trop faible
+//			si on repasse trop de fois par le même chemin (longue boucle par rapport à taille T on aspire) => minimum local 
+			for(int i=0;i<nombreDeVoisin;i++) {
+//				il existe au moins un voisin hors tabou !
+				if(!TabouTab.isInterdit(Voisin.voisins[i], Voisin.deplacements[i])) {
+					solution vois = new solution();
+					vois=Voisin.voisins[i];
+					int ind=i;
+					for(int j=0;j<nombreDeVoisin;j++) {
+						if(!TabouTab.isInterdit(Voisin.voisins[j], Voisin.deplacements[j]) && vois.dist>Voisin.voisins[j].dist) {
+							vois.clone(Voisin.voisins[j]);
+							ind=j;
 						}
 					}
+					TabouTab.addTabou(tempSol, Voisin.deplacements[ind]);
+					tempSol.clone(vois);
+					if(TabouTab.isInterdit(tempSol)>=(tailleDeT/2)) {
+//						on génère une nouvelle solution
+						tempSol.generation();
+					}
+					if(tempSol.dist<bestSol.dist) {
+						bestSol.clone(tempSol);
+					}
+					break;
 				}
 			}
 			
-			//Comparaison entre les deux solutions
-						
-			if(dPrime2<dPrime1){
-				s=sPrime2;
-				d=dPrime2;
-				if(aspired2==false){
-					T.add(mouvement2);
-				}
-			}
-			else{
-				s=sPrime1;
-				d=dPrime1;
-				if(aspired1==false){
-					T.add(mouvement1);
-				}
-			}
 			
-			if(T.size()>tailleT){
-				T.remove(0);
-			}
-			
-			if(d<dMin){
-				sMin=s;
-				dMin=d;
-				meilIter=nbIter;
-				nbIter=0;
-			}
 		}
-		//System.out.println("Solution finale");
-		//AfficherS(sMin);
-		//System.out.println("meil_iter : "+meilIter);
+		return bestSol;
+	}
+	
+	public int[] tabou (Cities cities) {
 		
-		//System.out.println(System.currentTimeMillis()-debut); // renvoie la durée du programme
+//		initialisation des données du problème
+		city=cities;
+		M=city.get_dist();
+		tailleM=city.get_num();
+
 		
+//		 création d'une solution admissible
+		solution s=new solution();
+//		créé une solution aléatoire
+		s.generation();
+//		distance de s
+		s.dist=distance(s.tab);
+//		définit le nombre de voisin pour une solution S
+		nbCombinaison(s);
 		
-		int[] sMinTab = toIntArray(sMin);
-		Object[] solFinale = {sMinTab,dMin};
-		return solFinale;
+//		Initialisation de la meilleure solution
+		solution bestSol=algo(s);
+		return bestSol.tab;
+
 	}
 	
+	public int[] tabou (Cities cities, int[] sTab) {
 	
-	
-	private List<Integer> arrayToList(int[] sTab){
-		List<Integer> sList = new ArrayList<Integer>();
-		  for(int i = 0;i < sTab.length;i++) {
-			   sList.add(sTab[i]);
-		  }
-		    
-		return sList;
-	}
-	
-	private int[] toIntArray(List<Integer> list){
+//		initialisation des données du problème
+		city=cities;
+		M=city.get_dist();
+		tailleM=city.get_num();
+
 		
-		  int[] ret = new int[list.size()];
-		  for(int i = 0;i < ret.length;i++)
-		    ret[i] = list.get(i);
-		  return ret;
-		}
-	
-	//Création d'une solution admissible
-		public List<Integer> solAdm() {
-			List<Integer> sol = new ArrayList<Integer>();
-			for(int i=1; i<tailleM;  i++) {
-				sol.add(i);
-			}
-			Collections.shuffle(sol);
-			return sol;
-		}
-
-	
-	//Attribue à un trajet la distance totale
-	public int distance(int[] s) {
-		int tailleS = s.length;
-		int d=M[s.get (0)][M.];
-		for (int i = 0; i< (tailleS - 1); i++) {
-			d += M[s.get(i)][s.get(i+1)];
-		}
-		d += M[s.get(tailleS -1)][0];		
-		return d;
-	}
-	
-	//Fonction qui génère l'espace N qui contient les voisins de s ainsi que le déplacement nécéssaire pour y aller à partir de s
-	public List<List<List<Integer>>> voisinGenerator(List<Integer> s){
-		// les voisins sont tous les solutions différentes où l'ont peut intervertir deux villes dans s
-		List<List<List<Integer>>> N = new ArrayList<List<List<Integer>>>();
-		List<List<Integer>> N0 = new ArrayList<List<Integer>>();
-		List<List<Integer>> N1 = new ArrayList<List<Integer>>();
-		int tailleS = s.size();
+//		 création d'une solution admissible
+		solution s=new solution();
+//		créé une solution aléatoire
+		s.tab=sTab.clone();
+//		distance de s
+		s.dist=distance(s.tab);
+//		définit le nombre de voisin pour une solution S
+		nbCombinaison(s);
 		
-		for (int i=0;i< tailleS ;i++){
-			for(int j=0;j<i;j++){
-				if(i!=j){
-					List<Integer> couple = new ArrayList<Integer>();
-					couple.add(i); couple.add(j); //on enregistre les coordonées de chaque terme à échanger
-					List<Integer> s2 = new ArrayList<Integer>();
-					s2=s;
-					int temp = s.get(i);
-					s2.set(i, s.get(j));
-					s2.set(j,temp);
-					N0.add(s2); //N(0) est l'ensemble N' du cours N(1) est l'ensemble des déplacements de s à N(0)
-					N1.add(couple);
-				}
-			}
-		}
-		N.add(N0);N.add(N1);
-		return N;
-	}
-
-	public void AfficherS(List<Integer> s){
-		for (int i=0;i<s.size();i++){
-			System.out.println(s.get(i));
-		}		
-		System.out.println(distance(s));
-	}
-	
-
-	
-
-/*	//Fonction aspiration
-	public static List<Integer> Aspiration(List<Integer> s){ // on mélange les trois éléments du milieu de s
-		List<Integer> threeS = new ArrayList<Integer>();
-		threeS.add(s.get(2));threeS.add(s.get(3));threeS.add(s.get(4));
-		java.util.Collections.shuffle(threeS);
-		s.set(2, threeS.get(0));
-		s.set(3, threeS.get(1));
-		s.set(4, threeS.get(2));
-		return s;
-	} */
-	
-	public List<Integer> Aspiration(List<Integer> s){ // on mélange les trois éléments du milieu de s
-		Collections.shuffle(s);
-		return s;
-	}
-
-	
+//		Initialisation de la meilleure solution
+		solution bestSol=algo(s);
+		return bestSol.tab;
+	}	
 }
