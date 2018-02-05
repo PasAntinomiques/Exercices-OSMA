@@ -143,7 +143,7 @@ public class AgentOptimisation extends Agent{
 				if(msg != null) {
 					try {
 						resultats[(nbMessages+2)]=(int[])msg.getContentObject();
-						System.out.println("Agent "+myAgent.getLocalName()+" : Receiving results from : "+msg.getSender().getLocalName());
+//						System.out.println("Agent "+myAgent.getLocalName()+" : Receiving results from : "+msg.getSender().getLocalName());
 					} catch (UnreadableException e) {
 						e.printStackTrace();
 					}

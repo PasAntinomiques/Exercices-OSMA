@@ -1,5 +1,3 @@
-package tabou;
-
 import java.util.*;
 import general.Cities;
 
@@ -16,7 +14,7 @@ public class taboulet {
 	public int meilIter = 0;
 //	taille de la liste tabou, à déterminer expérimentalement (entre 7 et 20) (doit être impair cf ligne 188)
 //	strictement supérieur à 2
-	public int tailleDeT = 20;
+	public int tailleDeT = 10;
 //	le nombre de voisin d'une solution s
 	private int nombreDeVoisin;
 	
@@ -40,7 +38,9 @@ public class taboulet {
 		}
 //		créé une solution similaire à la solution s
 		public void clone(solution s) {
-			this.generation();
+			if(this.tab==null) {
+				this.generation();	
+			}
 			this.dist=s.dist;
 			this.tab=s.tab.clone();
 		}
@@ -130,11 +130,22 @@ public class taboulet {
 			}
 			return compt;
 		}
+		public solution bestSolution() {
+			int i =0;
+			solution sol = solutionBase[0];
+			while(solutionBase[i]!=null && i<tailleT) {
+				if(solutionBase[i].dist<sol.dist) {
+					sol.clone(solutionBase[i]);
+				}
+				i++;
+			}
+			return sol;
+		}
 		
 		
 	}
 //	calcule la distance totale d'une solution s en partant de la ville de départ définie dans Cities
-	private int distance(int[] s) {
+	public int distance(int[] s) {
 		int S = M[city.get_start_city()][s[0]];
 		for(int i=0;i<s.length-1;i++) {
 			S += M[s[i]][s[i+1]];
@@ -196,6 +207,7 @@ public class taboulet {
 							ind=j;
 						}
 					}
+//					mise à jour de la liste tabou
 					TabouTab.addTabou(tempSol, Voisin.deplacements[ind]);
 					tempSol.clone(vois);
 //					cette solution est elle meilleure ?
@@ -206,7 +218,8 @@ public class taboulet {
 						System.out.println("Aspiration");
 //						on génère une nouvelle solution car on est passe trop de fois dans cette solution (minimum local), on tourne en boucle
 //						Pour améliorer l'algo on pourrait changer cette fonction d'aspiration, prendre la meilleure dans tabou ?
-						tempSol.generation();
+//						tempSol.generation();
+						tempSol.clone(TabouTab.bestSolution());
 						if(tempSol.dist<bestSol.dist) {
 							bestSol.clone(tempSol);
 						}
