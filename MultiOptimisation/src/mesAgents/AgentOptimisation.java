@@ -163,6 +163,7 @@ public class AgentOptimisation extends Agent{
 			 		}
 			 	}
 				System.out.println("Agent "+getLocalName()+" : Choosing : "+temp);
+				System.out.println("");
 				instantSol=resultats[indTemp].clone();
 				meilleureSol=instantSol.clone();
 				cout = temp;

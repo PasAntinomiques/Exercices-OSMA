@@ -11,7 +11,7 @@ public class Cities {
 	private int[][] dist;
 	private int start_city;
 	
-	
+/*	
 	
 	int[][] coord = {{6734,1453},
 			{2233,10},
@@ -61,9 +61,9 @@ public class Cities {
 			{6807,2993},
 			{5185,3258},
 			{3023,1942}};
+*/
 
 
-/*
 	//cas 439 villes
 
 	
@@ -507,7 +507,6 @@ public class Cities {
 		{1775,5375},
 		{2075,6475}
 	};
-	*/
 	
 	
 	

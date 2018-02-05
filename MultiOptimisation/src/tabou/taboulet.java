@@ -199,17 +199,19 @@ public class taboulet {
 					TabouTab.addTabou(tempSol, Voisin.deplacements[ind]);
 					tempSol.clone(vois);
 //					cette solution est elle meilleure ?
-					if(tempSol.dist<bestSol.dist) {
+					if(tempSol.dist<=bestSol.dist) {
 						bestSol.clone(tempSol);
-					}					
-					if(TabouTab.nombreDePassage(tempSol)==(tailleDeT/2)) {
-						System.out.println("Aspiration");
-//						on génère une nouvelle solution car on est passe trop de fois dans cette solution (minimum local), on tourne en boucle
-//						Pour améliorer l'algo on pourrait changer cette fonction d'aspiration, prendre la meilleure dans tabou ?
-						tempSol.generation();
-						if(tempSol.dist<bestSol.dist) {
-							bestSol.clone(tempSol);
+					}
+//					existe t'il une meilleure solution dans les voisins tabou compris ?
+					vois=Voisin.voisins[0];
+					for(int j=0;j<nombreDeVoisin;j++) {
+						if(vois.dist>Voisin.voisins[j].dist) {
+							vois.clone(Voisin.voisins[i]);
 						}
+					}
+//					est-il meilleure que la meilleure solution ?
+					if(vois.dist<=bestSol.dist) {
+						bestSol.clone(vois);
 					}
 					break;
 				}
