@@ -13,7 +13,7 @@ public class Recuit {
 		
 		final int nb_iter_cycle = 400;
 		final double t0 = 100;
-		final double a = 0.99;
+		final double a = 0.999995;
 		
 		// on initialise l'algo en générant un chemin aléatoire admissible
 		int[] s1 = genererCheminAleatoire(cities);

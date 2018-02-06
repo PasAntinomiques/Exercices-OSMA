@@ -27,17 +27,17 @@ public class Main {
 		AgentController recuit;
 		AgentController tabou;
 		
-		int MaxIteration = 1000;
+		int MaxIteration = 100000;
 		
 		try {
-			Object[] argsGenetique = {"genetique",MaxIteration,"recuit","genetique2"};
-			genetique = mc.createNewAgent("genetique1", "mesAgents.AgentOptimisation", argsGenetique);
+			Object[] argsGenetique = {"recuit",MaxIteration,"recuit","tabou"};
+			genetique = mc.createNewAgent("genetique", "mesAgents.AgentOptimisation", argsGenetique);
 			
-			Object[] argsRecuit = {"recuit",MaxIteration,"genetique1","genetique2"};
+			Object[] argsRecuit = {"recuit",MaxIteration,"genetique","tabou"};
 			recuit = mc.createNewAgent("recuit", "mesAgents.AgentOptimisation", argsRecuit);
 			
-			Object[] argsTabou = {"genetique",MaxIteration,"genetique1","recuit"};
-			tabou = mc.createNewAgent("genetique2", "mesAgents.AgentOptimisation", argsTabou);
+			Object[] argsTabou = {"recuit",MaxIteration,"genetique","recuit"};
+			tabou = mc.createNewAgent("tabou", "mesAgents.AgentOptimisation", argsTabou);
 			
 			genetique.start();
 			recuit.start();
